@@ -1,67 +1,45 @@
 const jwt = require("jsonwebtoken");
-// [SECTION] Environment Setup
-// import our .env for environment variables
-require('dotenv').config();
+const secret = "BlogApp";
 
 
-//[Section] Token Creation
+    module.exports.createAccessToken = (user) => {
 
-module.exports.createAccessToken = (user) => {
-    const data = {
-        id : user._id,
-        email : user.email,
-        isAdmin : user.isAdmin
+        const data = {
+            id : user._id,
+            email : user.email,
+            isAdmin : user.isAdmin
+        };
+
+        return jwt.sign(data, secret, {});
+        
     };
 
-    return jwt.sign(data, process.env.JWT_SECRET_KEY, {});
-    
-};
+    module.exports.verify = (req, res, next) => {
 
+        let token = req.headers.authorization;
 
-//[Token Verification]
+        if(typeof token === "undefined"){
+            return res.send({ auth: "Failed. No Token" });
+        } else {
+            token = token.slice(7, token.length);
+            jwt.verify(token, secret, function(err, decodedToken){
 
-module.exports.verify = (req, res, next) => {
-    console.log("headers:", req.headers.authorization); //checked if this is received
+                if(err){
+                    return res.send({
+                        auth: "Failed",
+                        message: err.message
+                    });
 
-    let token = req.headers.authorization;
+                } else {
 
-    if(typeof token === "undefined"){
-        return res.send({ auth: "Failed. No Token" }); //no token
-    } else {
-        console.log("token:", token);     
-        token = token.slice(7, token.length);
+                    req.user = decodedToken;
+                    next();
+                }
+            })
+        }
+    };
 
-        console.log("sliced token:", token);
-
-
-        //[Token decryption] 
-
-        jwt.verify(token, process.env.JWT_SECRET_KEY, function(err, decodedToken){
-            
-            //If there was an error in verification, an erratic token, a wrong secret within the token, we will send a message to the client.
-            if(err){
-                return res.status(403).send({
-                    auth: "Failed",
-                    message: err.message
-                });
-
-            } else {
-
-                console.log("result from verify method:")
-                console.log(decodedToken);
-                
-                // Else, if our token is verified to be correct, then we will update the request and add the user's decoded details.
-                req.user = decodedToken;
-
-                next();
-            }
-        })
-    }
-};
-
-//[Verify Admin] 
-module.exports.verifyAdmin = (req, res, next) => {
-
+    module.exports.verifyAdmin = (req, res, next) => {
 
     if(req.user.isAdmin){
         next();
@@ -74,13 +52,11 @@ module.exports.verifyAdmin = (req, res, next) => {
 
 }
 
-
-//[Error Handler]
 module.exports.errorHandler = (err, req, res, next) => {
+    //log the error
     console.log(err);
     const statusCode = err.status || 500;
     const errorMessage = err.message || 'Internal Server Error';
-
 
     res.status(statusCode).json({
         error:{
@@ -93,7 +69,6 @@ module.exports.errorHandler = (err, req, res, next) => {
 
 }
 
-//[auth.js] Middleware to check if the user is authenticated
 module.exports.isLoggedIn = (req, res, next) => {
     if (req.user) {
         next();
