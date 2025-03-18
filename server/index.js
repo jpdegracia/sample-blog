@@ -1,36 +1,51 @@
+// [Dependencies and Modules] 
 const express = require("express");
 const mongoose = require("mongoose");
-
 const cors = require("cors");
 
-//Routes Middleware
-const userRoutes = require("./routes/user");
-const postRoutes = require("./routes/post");
-const commentRoutes = require("./routes/comment");    
 
-const port = 4000;
+// //[Routes] 
+const userRoutes = require("./routes/user.js");
+const commentRoutes = require("./routes/comment.js");
+const postRoutes = require("./routes/post.js");
+
+require('dotenv').config();
+
 
 const app = express();
 
 app.use(express.json());
-app.use(express.urlencoded({extended:true}));
 
-app.use(cors());
 
-//MongoDB database
-mongoose.connect("mongodb+srv://admin:admin123@wdc028-course-booking.6ldv2.mongodb.net/Blog-API?retryWrites=true&w=majority");
+const corsOptions = {
+    origin: 
 
-mongoose.connection.once('open', () => console.log('Now connected to MongoDB Atlas.'));
+    ['http://localhost:8000','http://localhost:3000', 'http://localhost:4000'], 
+
+    credentials: true,  // Allow cookies and headers
+    optionsSuccessStatus: 200 // For legacy browser support
+};
+
+
+app.use(cors(corsOptions));
+
+
+
+
+mongoose.connect(process.env.MONGODB_STRING);
+mongoose.connection.once('open',()=> console.log('Now Connected to MongoDB Atlas.'));
 
 app.use("/users", userRoutes);
-app.use("/posts", postRoutes);
 app.use("/comments", commentRoutes);
+app.use("/posts", postRoutes);
+
+
 
 
 if(require.main === module){
-    app.listen(process.env.PORT || 4000, () => {
-        console.log(`API is now online on port ${ process.env.PORT || 4000 }`)
+    app.listen( process.env.PORT || 3000, () => {
+        console.log(`API is now online on port ${ process.env.PORT }`)
     });
 }
 
-module.exports = {app,mongoose};
+module.exports = { app, mongoose };
