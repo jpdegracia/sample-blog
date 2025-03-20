@@ -20,7 +20,7 @@ app.use(express.json());
 const corsOptions = {
     origin: 
 
-    ['http://localhost:8000','https://sample-blog-client.vercel.app/', 'https://sample-blog-5.onrender.com/'], 
+    ['https://sample-blog-client.vercel.app/', 'https://sample-blog-5.onrender.com/'], 
 
     credentials: true,  // Allow cookies and headers
     optionsSuccessStatus: 200 // For legacy browser support
