@@ -1,5 +1,5 @@
 {
-  "name": "s87-s89",
+  "name": "sample-blog-server",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -8,15 +8,13 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "description": "",
   "dependencies": {
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "init": "^0.1.2",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.12.1",
     "nodemon": "^3.1.9"
-  },
-  "description": "This project is a backend server for handling authentication, posts, and comments. Below are sample user accounts for testing purposes."
+  }
 }
